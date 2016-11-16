@@ -278,7 +278,7 @@ value rec ctyp =
       | None → error loc "no package type in this ocaml version" ]
   | TyPol loc pl t →
       match ocaml_ptyp_poly with
-      [ Some ptyp_poly → mktyp loc (ptyp_poly (uv pl) (ctyp t))
+      [ Some ptyp_poly → mktyp loc (ptyp_poly (add_dummy_locs (uv pl)) (ctyp t))
       | None → error loc "no poly types in that ocaml version" ]
   | TyPot loc pl t → error loc "'type id . t' not allowed here"
   | TyQuo loc s → mktyp loc (Ptyp_var (uv s))
@@ -315,7 +315,7 @@ and add_polytype t =
   match ocaml_ptyp_poly with
   [ Some ptyp_poly →
       match t with
-      [ MLast.TyPol loc pl t → mktyp loc (ptyp_poly (uv pl) (ctyp t))
+      [ MLast.TyPol loc pl t → mktyp loc (ptyp_poly (add_dummy_locs (uv pl)) (ctyp t))
       | _ →
           let loc = MLast.loc_of_ctyp t in
           mktyp loc (ptyp_poly [] (ctyp t)) ]
@@ -888,7 +888,7 @@ value rec expr =
           [ Some newtype →
               match uv w with
               [ Some _ → error loc "(type ..) not allowed with 'when'"
-              | None → mkexp loc (newtype (uv s) (expr e)) ]
+              | None → mkexp loc (newtype (add_dummy_loc (uv s)) (expr e)) ]
           | None → error loc "(type ..) not in this ocaml version" ]
       | [(PaOlb loc p eo, w, e)] →
           let lab = label_of_patt p in
@@ -1027,7 +1027,7 @@ value rec expr =
         | [e :: el] →
             let loc = Ploc.encl (loc_of_expr e) loc in
             mkexp loc (Pexp_sequence (expr e) (loop el)) ]
-  | ExSnd loc e s → mkexp loc (Pexp_send (expr e) (uv s))
+  | ExSnd loc e s → mkexp loc (Pexp_send (expr e) (add_dummy_loc (uv s)))
   | ExSpw loc e →
       match jocaml_pexp_spawn with
       [ Some pexp_spawn → mkexp loc (pexp_spawn (expr e))
@@ -1401,16 +1401,16 @@ and class_sig_item c l =
   | CgMth loc pf s t →
       [ocaml_class_type_field (mkloc loc)
          (ocaml_pctf_meth
-            (uv s, mkprivate (uv pf), add_polytype t, mkloc loc)) ::
+            (add_dummy_loc (uv s), mkprivate (uv pf), add_polytype t, mkloc loc)) ::
        l]
   | CgVal loc b s t →
       [ocaml_class_type_field (mkloc loc)
-         (ocaml_pctf_val (uv s, mkmutable (uv b), ctyp t, mkloc loc)) ::
+         (ocaml_pctf_val (add_dummy_loc (uv s), mkmutable (uv b), ctyp t, mkloc loc)) ::
        l]
   | CgVir loc b s t →
       [ocaml_class_type_field (mkloc loc)
          (ocaml_pctf_virt
-            (uv s, mkprivate (uv b), add_polytype t, mkloc loc)) ::
+            (add_dummy_loc (uv s), mkprivate (uv b), add_polytype t, mkloc loc)) ::
        l] ]
 and class_expr =
   fun
@@ -1493,7 +1493,7 @@ and class_str_item c l =
   | CrDcl loc cl → List.fold_right class_str_item (uv cl) l
   | CrInh loc ce pb →
       [ocaml_class_field (mkloc loc)
-         (ocaml_pcf_inher (class_expr ce) (uv pb)) ::
+         (ocaml_pcf_inher (class_expr ce) (add_dummy_loc_opt (uv pb))) ::
        l]
   | CrIni loc e →
       match ocaml_pcf_init with

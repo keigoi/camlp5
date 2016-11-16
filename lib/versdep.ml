@@ -168,10 +168,18 @@ value ocaml_mkmod loc x =
   IFDEF OCAML_VERSION < OCAML_4_02_0 THEN {pmod_desc = x; pmod_loc = loc}
   ELSE {pmod_desc = x; pmod_loc = loc; pmod_attributes = []} END
 ;
+
+value add_dummy_loc t = {Asttypes.txt = t; Asttypes.loc = loc_none}
+;
+value add_dummy_loc_opt = fun [ Some t -> Some (add_dummy_loc t) | None -> None ]
+;                                                                              
+value add_dummy_locs xs = List.map add_dummy_loc xs
+;
+
 value ocaml_mkfield loc (lab, x) fl =
   IFDEF OCAML_VERSION < OCAML_4_02_0 THEN
     [{pfield_desc = Pfield lab x; pfield_loc = loc} :: fl]
-  ELSE [(lab, x) :: fl] END
+  ELSE [(add_dummy_loc lab, x) :: fl] END
 ;
 value ocaml_mkfield_var loc =
   IFDEF OCAML_VERSION < OCAML_4_02_0 THEN

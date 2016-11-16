@@ -100,7 +100,7 @@ let ocaml_mkmod loc x =
   {pmod_desc = x; pmod_loc = loc; pmod_attributes = []}
 ;;
   
-let add_dummy_loc t = Asttypes.({txt = t; loc = Location.none});;
+let add_dummy_loc t = Asttypes.({txt = t; loc = loc_none});;
 let add_dummy_loc_opt = function Some t -> Some (add_dummy_loc t) | None -> None;;
 let add_dummy_locs xs = List.map add_dummy_loc xs;;
   
