@@ -1,6 +1,7 @@
 #!/bin/sh
 # camlp5_comm.sh,v
-
+OCAMLRUN=~/.opam1.2/4.04.0/bin/ocamlrun
+CAMLP5BUILD=~/.opam1.2/4.04.0/build/camlp5.7.06
 ARGS1="-mode $MODE"
 FILE=
 QUIET=no
@@ -21,11 +22,11 @@ if test "$2" = "camlp5r" -o "$2" = "camlp5"; then
   else WHAT="${CAMLP5N}"; fi
   case "$COMPWITH/$WHAT" in
   old/*)
-    COMM="${OCAMLN}run$EXE ../boot/$WHAT$EXE -nolib -I ../boot";;
+    COMM="$OCAMLRUN $CAMLP5BUILD/boot/$WHAT$EXE -nolib -I $CAMLP5BUILD/boot";;
   new/${CAMLP5N})
-    COMM="${OCAMLN}run$EXE ../main/$WHAT$EXE -nolib -I ../meta -I ../etc";;
+    COMM="$OCAMLRUN $CAMLP5BUILD/main/$WHAT$EXE -nolib -I $CAMLP5BUILD/meta -I ../etc";;
   new/${CAMLP5N}r)
-    COMM="${OCAMLN}run$EXE ../meta/$WHAT$EXE -nolib -I ../meta -I ../etc";;
+    COMM="$OCAMLRUN $CAMLP5BUILD/meta/$WHAT$EXE -nolib -I $CAMLP5BUILD/meta -I ../etc";;
   *)
     echo "internal error: bad value of COMPWITH/WHAT" 1>&2; exit 2;;
   esac
