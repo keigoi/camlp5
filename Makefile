@@ -4,6 +4,7 @@ include config/Makefile
 
 DIRS=lib odyl main meta etc top ocpp man
 FDIRS=lib odyl main meta
+OPTLIBDIRS=ocaml_stuff lib odyl main
 OPTDIRS=ocaml_stuff lib odyl main meta etc
 OPTOPTDIRS=compile
 SHELL=/bin/sh
@@ -14,11 +15,16 @@ DIFF_OPT=
 # by "make install DESTDIR=..."
 DESTDIR=
 
+IOSMAKE=PATH="`opam var prefix`/ios-sysroot/bin:$(PATH)" $(MAKE)
+
 all: world.opt
 
 out: boot/$(CAMLP5N)$(EXE)
-	set -e; cd ocaml_stuff; $(MAKE); cd ..
-	set -e; for i in $(DIRS); do cd $$i; $(MAKE) all; cd ..; done
+	set -e; cd ocaml_stuff; $(IOSMAKE); cd ..
+	set -e; for i in $(DIRS); do cd $$i; $(IOSMAKE) all; cd ..; done
+
+optlib:
+	set -e; for i in $(OPTLIBDIRS); do cd $$i; $(IOSMAKE) opt; cd ..; done; cd etc; $(IOSMAKE) META; cd ..
 
 opt:
 	set -e; for i in $(OPTDIRS); do cd $$i; $(MAKE) opt; cd ..; done
